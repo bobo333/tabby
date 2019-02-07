@@ -1,10 +1,10 @@
 CC=gcc
 
 compile: clean
-	$(CC) -Wall -o tabby main.c
+	$(CC) -Wall -Werror -o tabby main.c
 
 run: compile
 	./tabby
 
 clean:
-	rm tabby
+	rm tabby || true
