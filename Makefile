@@ -1,6 +1,6 @@
 CC=gcc
 
-compile:
+compile: clean
 	$(CC) -Wall -o tabby main.c
 
 run: compile
