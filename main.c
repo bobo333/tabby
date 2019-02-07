@@ -1,6 +1,6 @@
 /*
     TODO:
-    - parameterize file path
+    - check for file existence gracefully
     - calculate padding size
     - don't print padding frame(s)
     - add frame header contents to frame struct
@@ -30,12 +30,17 @@ void traverse_id3_frames(FILE *, unsigned long int, unsigned long int);
 void get_frame_header_data(FILE *, ID3Frame *);
 int in_padding(ID3Frame *);
 
-int main() {
+int main(int argc, char *argv[]) {
     unsigned char *header;
     unsigned long int tag_size;
     FILE *fptr;
 
-    fptr = fopen("data/soviet_anthem.mp3", "rb");
+    if (argc < 2) {
+        printf("Error: please provide path to file\n");
+        exit(1);
+    }
+
+    fptr = fopen(argv[1], "rb");
     header = (unsigned char *)malloc(10 * sizeof(unsigned char));
     fread(header, 10, 1, fptr);
 
