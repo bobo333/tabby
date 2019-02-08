@@ -108,7 +108,7 @@ void parse_id3v2_frame(FILE * f, ID3v2Frame * frame) {
 void display_id3v2_frame(ID3v2Frame * frame) {
     printf("id: ");
     print_chars(frame->id, 0, 4);
-    printf("content_size: %lu\n", frame->content_size);
+    printf("content_size: %lu bytes\n", frame->content_size);
 }
 
 unsigned long int get_frame_size(unsigned char * header, int size_start) {
