@@ -26,7 +26,6 @@ void print_binary(unsigned char * data, int start, int num) {
     char bits[9];
 
     for (i = 0; i < num; i++) {
-
         unsigned char byte = data[start + i];
         for (j = 0; j < 8; j++) {
             if (byte & 1) {
@@ -37,7 +36,6 @@ void print_binary(unsigned char * data, int start, int num) {
             byte>>=1;
         }
         bits[8] = '\0';
-
         printf("%s ", bits);
     }
     printf("\n");
