@@ -6,6 +6,8 @@
 
 unsigned long int get_frames_size(unsigned char *, int);
 unsigned long int get_frame_size(unsigned char *, int);
+ID3v2Frame * get_frame_header_data(FILE *);
+int in_padding(ID3v2Frame *);
 
 /*
     Header / Full Tag
@@ -82,6 +84,7 @@ ID3v2Frame * parse_id3v2_frame(unsigned char * frame_header) {
     }
     // bytes 4-7 are size
     frame->content_size = get_frame_size(frame_header, 4);
+    frame->total_size = frame->content_size + 10;
     // bytes 8-9 are flags
     for (i = 8, j = 0; i < 10; i++,j++) {
         frame->flags[j] = frame_header[i];
@@ -121,4 +124,40 @@ unsigned long int get_frame_size(unsigned char * header, int size_start) {
     return total;
 }
 
-// traverse id3v2 frames
+void traverse_id3_frames(FILE * f, unsigned long int pos, unsigned long int length) {
+    ID3v2Frame * frame;
+
+    while (pos < length) {
+        frame = get_frame_header_data(f);
+        pos += frame->total_size;
+        fseek(f, frame->content_size, SEEK_CUR);
+
+        // check if we've hit padding
+        if (in_padding(frame) == 1) {
+            printf("end of id3v2 frames\n");
+            break;
+        }
+
+        display_id3v2_frame(frame);
+    }
+
+    free(frame);
+}
+
+ID3v2Frame * get_frame_header_data(FILE * f) {
+    unsigned char * header = (unsigned char *)malloc(10 * sizeof(unsigned char));
+    fread(header, 10, 1, f);
+
+    return parse_id3v2_frame(header);
+}
+
+int in_padding(ID3v2Frame * frame) {
+    int i;
+    for (i = 0; i < 4; i++) {
+        if (frame->id[i] != 0) {
+            return 0;
+        }
+    }
+
+    return 1;
+}
