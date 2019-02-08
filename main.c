@@ -1,7 +1,5 @@
 /*
     TODO:
-    - add frame header contents to frame struct
-        - do all manipulation on the copied data to avoid seek errors
     - general clean up
         - get tag size vs get frame size (combine?)
     - parse mpeg frames

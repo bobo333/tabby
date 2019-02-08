@@ -15,7 +15,7 @@ unsigned long int get_frames_size(unsigned char *, int);
 void parse_id3v2_frame(FILE *, ID3v2Frame *);
 void display_id3v2_frame(ID3v2Frame *);
 unsigned long int get_frame_size(unsigned char *, int);
-int in_padding(ID3v2Frame *);
+bool in_padding(ID3v2Frame *);
 
 /*
     Header / Full Tag
@@ -144,7 +144,7 @@ void traverse_id3v2_frames(FILE * f, unsigned long int pos, unsigned long int le
         fseek(f, frame->content_size, SEEK_CUR);
 
         // check if we've hit padding
-        if (in_padding(frame) == 1) {
+        if (in_padding(frame) == TRUE) {
             printf("end of id3v2 frames\n");
             break;
         }
@@ -155,13 +155,13 @@ void traverse_id3v2_frames(FILE * f, unsigned long int pos, unsigned long int le
     free(frame);
 }
 
-int in_padding(ID3v2Frame * frame) {
+bool in_padding(ID3v2Frame * frame) {
     int i;
     for (i = 0; i < 4; i++) {
         if (frame->id[i] != 0) {
-            return 0;
+            return FALSE;
         }
     }
 
-    return 1;
+    return TRUE;
 }
