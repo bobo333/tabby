@@ -13,8 +13,8 @@
 
 int main(int argc, char *argv[]) {
     char * file_name;
-    FILE *fptr;
-    ID3v2Header * header = malloc(sizeof(ID3v2Header));
+    FILE * fptr;
+    ID3v2Header * header;
 
     if (argc < 2) {
         printf("Error: please provide path to file\n");
@@ -26,6 +26,7 @@ int main(int argc, char *argv[]) {
     check_file(file_name);
     fptr = fopen(file_name, "rb");
 
+    header = malloc(sizeof(ID3v2Header));
     parse_id3v2_header(fptr, header);
     display_id3v2_header(header);
     traverse_id3v2_frames(fptr, 10, header->total_size);
