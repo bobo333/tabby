@@ -1,6 +1,5 @@
 /*
     TODO:
-    - check for file existence gracefully
     - calculate padding size
     - don't print padding frame(s)
     - add frame header contents to frame struct
@@ -15,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 typedef struct {
     unsigned long int length;
@@ -33,6 +33,7 @@ int in_padding(ID3Frame *);
 int main(int argc, char *argv[]) {
     unsigned char *header;
     unsigned long int tag_size;
+    char * file_name;
     FILE *fptr;
 
     if (argc < 2) {
@@ -40,7 +41,18 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    fptr = fopen(argv[1], "rb");
+    // check file exists and can be read
+    file_name = argv[1];
+    if (access(file_name, F_OK) != 0) {
+        printf("Error: file %s not found\n", file_name);
+        exit(1);
+    }
+    if (access(file_name, R_OK) != 0) {
+        printf("Error: do not have read access to file %s\n", file_name);
+        exit(1);
+    }
+
+    fptr = fopen(file_name, "rb");
     header = (unsigned char *)malloc(10 * sizeof(unsigned char));
     fread(header, 10, 1, fptr);
 
