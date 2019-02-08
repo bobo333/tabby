@@ -11,9 +11,9 @@ typedef struct {
     unsigned long int total_size;
 } ID3v2Header;
 
-ID3v2Header * parse_id3v2_header(unsigned char *);
+void parse_id3v2_header(FILE *, ID3v2Header *);
 void display_id3v2_header(ID3v2Header *);
 
-void traverse_id3_frames(FILE *, unsigned long int, unsigned long int);
+void traverse_id3v2_frames(FILE *, unsigned long int, unsigned long int);
 
 #endif

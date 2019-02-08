@@ -13,7 +13,7 @@ typedef struct {
 } ID3v2Frame;
 
 unsigned long int get_frames_size(unsigned char *, int);
-ID3v2Frame * parse_id3v2_frame(FILE *);
+void parse_id3v2_frame(FILE *, ID3v2Frame *);
 void display_id3v2_frame(ID3v2Frame *);
 unsigned long int get_frame_size(unsigned char *, int);
 int in_padding(ID3v2Frame *);
@@ -22,9 +22,11 @@ int in_padding(ID3v2Frame *);
     Header / Full Tag
 */
 
-ID3v2Header * parse_id3v2_header(unsigned char * raw_header) {
+void parse_id3v2_header(FILE * f, ID3v2Header * header) {
     int i, j;
-    ID3v2Header * header = malloc(sizeof(ID3v2Header));
+    unsigned char * raw_header = (unsigned char *)malloc(10 * sizeof(unsigned char));
+
+    fread(raw_header, 10, 1, f);
 
     // bytes 0-2 are ID
     for (i = 0; i < 3; i++) {
@@ -40,7 +42,7 @@ ID3v2Header * parse_id3v2_header(unsigned char * raw_header) {
     header->frames_size = get_frames_size(raw_header, 6);
     header->total_size = header->frames_size + 10;
 
-    return header;
+    free(raw_header);
 }
 
 void display_id3v2_header(ID3v2Header * header) {
@@ -83,10 +85,9 @@ unsigned long int get_frames_size(unsigned char * raw_header, int size_start) {
     Frames
 */
 
-ID3v2Frame * parse_id3v2_frame(FILE * f) {
+void parse_id3v2_frame(FILE * f, ID3v2Frame * frame) {
     unsigned char * frame_header = (unsigned char *)malloc(10 * sizeof(unsigned char));
     fread(frame_header, 10, 1, f);
-    ID3v2Frame * frame = malloc(sizeof(ID3v2Frame));
     int i, j;
 
     // bytes 0-3 are ID
@@ -101,7 +102,7 @@ ID3v2Frame * parse_id3v2_frame(FILE * f) {
         frame->flags[j] = frame_header[i];
     }
 
-    return frame;
+    free(frame_header);
 }
 
 void display_id3v2_frame(ID3v2Frame * frame) {
@@ -135,11 +136,11 @@ unsigned long int get_frame_size(unsigned char * header, int size_start) {
     return total;
 }
 
-void traverse_id3_frames(FILE * f, unsigned long int pos, unsigned long int length) {
-    ID3v2Frame * frame;
+void traverse_id3v2_frames(FILE * f, unsigned long int pos, unsigned long int length) {
+    ID3v2Frame * frame = malloc(sizeof(ID3v2Frame));
 
     while (pos < length) {
-        frame = parse_id3v2_frame(f);
+        parse_id3v2_frame(f, frame);
         pos += frame->total_size;
         fseek(f, frame->content_size, SEEK_CUR);
 
