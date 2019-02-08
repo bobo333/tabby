@@ -4,6 +4,7 @@
         - get tag size vs get frame size (combine?)
     - parse mpeg frames
     - tests
+    - byte constants
 */
 
 #include <stdlib.h>
