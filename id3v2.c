@@ -4,9 +4,18 @@
 
 #include "util.h"
 
+typedef struct {
+    unsigned long int content_size;
+    unsigned long int total_size;
+    unsigned char id[4];
+    unsigned char flags[2];
+    int has_flags;
+} ID3v2Frame;
+
 unsigned long int get_frames_size(unsigned char *, int);
+ID3v2Frame * parse_id3v2_frame(FILE *);
+void display_id3v2_frame(ID3v2Frame *);
 unsigned long int get_frame_size(unsigned char *, int);
-ID3v2Frame * get_frame_header_data(FILE *);
 int in_padding(ID3v2Frame *);
 
 /*
@@ -74,7 +83,9 @@ unsigned long int get_frames_size(unsigned char * raw_header, int size_start) {
     Frames
 */
 
-ID3v2Frame * parse_id3v2_frame(unsigned char * frame_header) {
+ID3v2Frame * parse_id3v2_frame(FILE * f) {
+    unsigned char * frame_header = (unsigned char *)malloc(10 * sizeof(unsigned char));
+    fread(frame_header, 10, 1, f);
     ID3v2Frame * frame = malloc(sizeof(ID3v2Frame));
     int i, j;
 
@@ -128,7 +139,7 @@ void traverse_id3_frames(FILE * f, unsigned long int pos, unsigned long int leng
     ID3v2Frame * frame;
 
     while (pos < length) {
-        frame = get_frame_header_data(f);
+        frame = parse_id3v2_frame(f);
         pos += frame->total_size;
         fseek(f, frame->content_size, SEEK_CUR);
 
@@ -142,13 +153,6 @@ void traverse_id3_frames(FILE * f, unsigned long int pos, unsigned long int leng
     }
 
     free(frame);
-}
-
-ID3v2Frame * get_frame_header_data(FILE * f) {
-    unsigned char * header = (unsigned char *)malloc(10 * sizeof(unsigned char));
-    fread(header, 10, 1, f);
-
-    return parse_id3v2_frame(header);
 }
 
 int in_padding(ID3v2Frame * frame) {
