@@ -1,5 +1,7 @@
 #include "util.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 void print_chars(unsigned char * data, int start, int num) {
     int i;
@@ -39,4 +41,15 @@ void print_binary(unsigned char * data, int start, int num) {
         printf("%s ", bits);
     }
     printf("\n");
+}
+
+void check_file(char * file_name) {
+    if (access(file_name, F_OK) != 0) {
+        printf("Error: file %s not found\n", file_name);
+        exit(1);
+    }
+    if (access(file_name, R_OK) != 0) {
+        printf("Error: do not have read access to file %s\n", file_name);
+        exit(1);
+    }
 }

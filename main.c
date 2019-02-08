@@ -15,7 +15,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "id3v2.h"
 #include "util.h"
@@ -44,14 +43,7 @@ int main(int argc, char *argv[]) {
 
     // check file exists and can be read
     file_name = argv[1];
-    if (access(file_name, F_OK) != 0) {
-        printf("Error: file %s not found\n", file_name);
-        exit(1);
-    }
-    if (access(file_name, R_OK) != 0) {
-        printf("Error: do not have read access to file %s\n", file_name);
-        exit(1);
-    }
+    check_file(file_name);
 
     fptr = fopen(file_name, "rb");
     raw_header = (unsigned char *)malloc(10 * sizeof(unsigned char));
@@ -59,6 +51,8 @@ int main(int argc, char *argv[]) {
 
     header = parse_id3v2_header_data(raw_header);
     display_id3v2_header(header);
+
+    free(raw_header);
 
     // // first frame header
     // traverse_id3_frames(fptr, 10, tag_size);
